@@ -3,17 +3,19 @@ import matplotlib.pyplot as plt
 from collections import defaultdict
 import matplotlib.patches as mpatches
 
+#setting file names to variables
 population = 'population_total.tsv'
 bmi = 'bmi_men.tsv'
 gdp = 'gdp.tsv'
 colordata = 'continents.tsv'
 
+#reading files with read_csv
 pop_data = pd.read_csv(population, sep = '\t', header=None)
 bmi_data = pd.read_csv(bmi, sep = '\t', header=None)
 gdp_data = pd.read_csv(gdp, sep = '\t', header=None)
 color_data = pd.read_csv(colordata, sep = '\t', header=None)
 
-
+#function to create a dictionary that maps one list of elements to another
 def dictionarymaking(list_of_lists1, list_of_lists2):
     the_list1 = []
     the_list2 = []
@@ -29,20 +31,25 @@ def dictionarymaking(list_of_lists1, list_of_lists2):
         mydictionary = dict(zip(flattened_list1, flattened_list2))
     return mydictionary
 
+#created dictionary that maps country to BMI
 bmi_dictionary = dictionarymaking(bmi_data.iloc[:, 0:1].values.tolist(), bmi_data.iloc[:, 1:2].values.tolist() )
 
 #print(bmi_dictionary)
 
+#created dictionary that maps country to GDP
 gdp_dictionary = dictionarymaking(gdp_data.iloc[:,0:1].values.tolist(), gdp_data.iloc[:,1:2].values.tolist())
 
 #print(gdp_dictionary)
 
+#created dictionary that maps country to population
 pop_dictionary = dictionarymaking(pop_data.iloc[:,0:1].values.tolist(), pop_data.iloc[:,1:2].values.tolist())
 
 #print(pop_dictionary)
+
+#created dictionary that maps country to continent
 color_dictionary= dictionarymaking(color_data.iloc[:,0:1].values.tolist(), color_data.iloc[:,1:2].values.tolist())
 
-
+#replaces continents with colors
 for country, continent in color_dictionary.items():
     if continent == 'Europe':
         color_dictionary[country] = 'red'
@@ -73,12 +80,14 @@ for color, continent in color_dictionary.items():
 
 print(color_dictionary)
 
-
+#for loop to take only countries that exist in gdp_dictionary and bmi_dictionary and gets a list of bmi, gdp, population, and colors
+#which represents continents in a list of tuples.
 list_of_bmi_gdp = []
 for element in gdp_dictionary.keys():
     if element in bmi_dictionary.keys():
         list_of_bmi_gdp.append((bmi_dictionary[element], gdp_dictionary[element], pop_dictionary[element]/8000000, color_dictionary.get(element, 'None')))
 
+#creates patches that will become the legends that represents continents as colors.
 red_patch = mpatches.Patch(color='red', label='Europe')
 orange_patch=mpatches.Patch(color='orange', label='Asia')
 yellow_patch=mpatches.Patch(color='yellow', label='Oceania')
@@ -86,6 +95,7 @@ green_patch=mpatches.Patch(color='green', label='Africa')
 blue_patch=mpatches.Patch(color='blue',label='North America')
 purple_patch=mpatches.Patch(color='purple', label='South America')
 
+#creation of the scatterplot
 x,y,z, q= zip(*list_of_bmi_gdp)
 plt.scatter(x,y,s=z, c=q)
 plt.xlabel('BMI of men')
